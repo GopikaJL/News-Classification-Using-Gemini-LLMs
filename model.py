@@ -210,3 +210,278 @@ Category:
 
 Model Response:
 Category: Politics
+# Step 1: Mark the few-shot dataset
+few_shot_ids = few_shot_df.index.tolist()  # Get the indices of few-shot examples
+
+# Step 2: Exclude few-shot examples from the original dataset
+zero_shot_df = df.drop(index=few_shot_ids).reset_index(drop=True)  # Exclude few-shot rows
+# Step 3: Perform Zero-Shot Testing
+from sklearn.metrics import classification_report, accuracy_score
+
+
+# Sample 60 articles for zero-shot testing
+zero_shot_sample = zero_shot_df.sample(150, random_state=42)
+print(zero_shot_sample)
+true_labels = []
+predicted_labels = []
+
+# Process the articles in smaller batches
+batch_size = 10  # Process 10 articles at a time
+num_batches = (len(zero_shot_sample) + batch_size - 1) // batch_size  # Total batches
+
+for batch_index in range(num_batches):
+    batch_data = zero_shot_sample.iloc[batch_index * batch_size : (batch_index + 1) * batch_size]
+
+    # Create a batch prompt
+    batch_prompt = "Classify the following articles into one of these categories: Business, Entertainment, Politics, Sport, Tech.\n\n"
+    
+    for _, row in batch_data.iterrows():
+        true_labels.append(row['category'])  # Append true category
+        batch_prompt += f"Article: {row['text'][:150]}...\n\n"  # Truncate article
+
+    batch_prompt += "Provide only the category name for each article."
+
+    # Send a single API request for the batch
+    response = model.generate_content(batch_prompt)
+
+    # Debug: Print raw response
+    print("Raw Model Response:")
+    print(response.text)
+
+    # Directly split the response into predicted labels
+    batch_predictions = response.text.splitlines()  # Each line corresponds to a prediction
+    predicted_labels.extend(batch_predictions)
+
+# Ensure consistent lengths of true and predicted labels
+if len(predicted_labels) < len(true_labels):
+    predicted_labels.extend(["Unknown"] * (len(true_labels) - len(predicted_labels)))
+elif len(predicted_labels) > len(true_labels):
+    predicted_labels = predicted_labels[:len(true_labels)]
+true_labels = [label.title() for label in true_labels]  # Convert to title-case
+predicted_labels = [label.title() for label in predicted_labels]  # Convert to title-case
+
+# Compute classification report and accuracy
+valid_categories = ["Business", "Entertainment", "Politics", "Sport", "Tech"]
+
+print("True Labels:", true_labels)
+print("Predicted Labels:", predicted_labels)
+print("Unique True Labels:", set(true_labels))
+print("Unique Predicted Labels:", set(predicted_labels))
+
+print("Classification Report:")
+print(classification_report(true_labels, predicted_labels, target_names=valid_categories))
+
+accuracy = accuracy_score(true_labels, predicted_labels)
+print(f"Accuracy: {accuracy * 100:.2f}%")
+category                                               text
+1451  entertainment  Public show for Reynolds portrait\n\nSir Joshu...
+1334  entertainment  Celebrities get to stay in jungle\n\nAll four ...
+1761       business  Wembley firm won't make a profit\n\nShares in ...
+1735       business  Shares rise on new Man Utd offer\n\nShares in ...
+1576  entertainment  Jarre joins fairytale celebration\n\nFrench mu...
+...             ...                                                ...
+135        politics  Security papers 'found in street'\n\nAn inquir...
+1501  entertainment  Connick Jr to lead Broadway show\n\nSinger and...
+1855       business  Metlife buys up Citigroup insurer\n\nUS bankin...
+360        politics  Lord Scarman, 93, dies peacefully\n\nDistingui...
+538           sport  Wright-Phillips to start on right\n\nEngland c...
+
+[150 rows x 2 columns]
+Raw Model Response:
+Entertainment
+Entertainment
+Business
+Business
+Entertainment
+Tech
+Entertainment
+Sport
+Sport
+Sport
+
+Raw Model Response:
+Sport
+Business
+Tech
+Business
+Business
+Tech
+Entertainment
+Politics
+Business
+Entertainment
+
+Raw Model Response:
+Business
+Business
+Entertainment
+Business
+Politics
+Business
+Sport
+Entertainment
+Sport
+Politics
+
+Raw Model Response:
+Sport
+Sport
+Business
+Sport
+Business
+Sport
+Business
+Politics
+Politics
+Politics
+
+Raw Model Response:
+Business
+Tech
+Sport
+Politics
+Sport
+Politics
+Sport
+Politics
+Entertainment
+Politics
+
+Raw Model Response:
+Sport
+Business
+Tech
+Sport
+Business
+Politics
+Business
+Entertainment
+Tech
+Sport
+
+Raw Model Response:
+Entertainment
+Business
+Sport
+Entertainment
+Business
+Sport
+Politics
+Politics
+Entertainment
+Sport
+
+Raw Model Response:
+Entertainment
+Politics
+Business
+Tech
+Sport
+Sport
+Tech
+Business
+Entertainment
+Entertainment
+
+Raw Model Response:
+Business
+Politics
+Politics
+Sport
+Entertainment
+Tech
+Business
+Sport
+Sport
+Tech
+
+Raw Model Response:
+Politics
+Sport
+Business
+Business
+Sport
+Sport
+Politics
+Tech
+Sport
+Sport
+
+Raw Model Response:
+Business
+Politics
+Business
+Entertainment
+Entertainment
+Politics
+Entertainment
+Tech
+Sport
+Sport
+
+Raw Model Response:
+Sport
+Business
+Business
+Tech
+Sport
+Politics
+Politics
+Business
+Tech
+Politics
+
+Raw Model Response:
+Sport
+Tech
+Sport
+Business
+Politics
+Sport
+Business
+Politics
+Tech
+Sport
+
+Raw Model Response:
+Tech
+Politics
+Entertainment
+Politics
+Business
+Entertainment
+Sport
+Tech
+Tech
+Entertainment
+
+Raw Model Response:
+Politics
+Entertainment
+Sport
+Sport
+Politics
+Politics
+Entertainment
+Business
+Politics
+Sport
+
+True Labels: ['Entertainment', 'Entertainment', 'Business', 'Business', 'Entertainment', 'Tech', 'Entertainment', 'Sport', 'Sport', 'Sport', 'Sport', 'Business', 'Tech', 'Business', 'Business', 'Tech', 'Entertainment', 'Politics', 'Business', 'Entertainment', 'Business', 'Business', 'Entertainment', 'Business', 'Politics', 'Business', 'Sport', 'Entertainment', 'Sport', 'Politics', 'Sport', 'Sport', 'Business', 'Sport', 'Business', 'Sport', 'Business', 'Politics', 'Politics', 'Politics', 'Business', 'Tech', 'Sport', 'Politics', 'Sport', 'Politics', 'Sport', 'Business', 'Entertainment', 'Politics', 'Sport', 'Business', 'Tech', 'Sport', 'Business', 'Politics', 'Business', 'Entertainment', 'Tech', 'Sport', 'Entertainment', 'Business', 'Sport', 'Entertainment', 'Business', 'Sport', 'Business', 'Politics', 'Entertainment', 'Sport', 'Entertainment', 'Business', 'Business', 'Tech', 'Sport', 'Business', 'Tech', 'Business', 'Entertainment', 'Entertainment', 'Business', 'Politics', 'Politics', 'Sport', 'Entertainment', 'Tech', 'Business', 'Sport', 'Sport', 'Tech', 'Politics', 'Sport', 'Business', 'Business', 'Sport', 'Sport', 'Politics', 'Business', 'Sport', 'Sport', 'Business', 'Politics', 'Business', 'Entertainment', 'Entertainment', 'Politics', 'Entertainment', 'Tech', 'Sport', 'Sport', 'Tech', 'Business', 'Business', 'Tech', 'Sport', 'Politics', 'Politics', 'Business', 'Tech', 'Politics', 'Sport', 'Tech', 'Sport', 'Business', 'Politics', 'Sport', 'Business', 'Politics', 'Tech', 'Sport', 'Tech', 'Politics', 'Tech', 'Politics', 'Business', 'Entertainment', 'Sport', 'Tech', 'Tech', 'Entertainment', 'Politics', 'Entertainment', 'Sport', 'Sport', 'Business', 'Politics', 'Entertainment', 'Business', 'Politics', 'Sport']
+Predicted Labels: ['Entertainment', 'Entertainment', 'Business', 'Business', 'Entertainment', 'Tech', 'Entertainment', 'Sport', 'Sport', 'Sport', 'Sport', 'Business', 'Tech', 'Business', 'Business', 'Tech', 'Entertainment', 'Politics', 'Business', 'Entertainment', 'Business', 'Business', 'Entertainment', 'Business', 'Politics', 'Business', 'Sport', 'Entertainment', 'Sport', 'Politics', 'Sport', 'Sport', 'Business', 'Sport', 'Business', 'Sport', 'Business', 'Politics', 'Politics', 'Politics', 'Business', 'Tech', 'Sport', 'Politics', 'Sport', 'Politics', 'Sport', 'Politics', 'Entertainment', 'Politics', 'Sport', 'Business', 'Tech', 'Sport', 'Business', 'Politics', 'Business', 'Entertainment', 'Tech', 'Sport', 'Entertainment', 'Business', 'Sport', 'Entertainment', 'Business', 'Sport', 'Politics', 'Politics', 'Entertainment', 'Sport', 'Entertainment', 'Politics', 'Business', 'Tech', 'Sport', 'Sport', 'Tech', 'Business', 'Entertainment', 'Entertainment', 'Business', 'Politics', 'Politics', 'Sport', 'Entertainment', 'Tech', 'Business', 'Sport', 'Sport', 'Tech', 'Politics', 'Sport', 'Business', 'Business', 'Sport', 'Sport', 'Politics', 'Tech', 'Sport', 'Sport', 'Business', 'Politics', 'Business', 'Entertainment', 'Entertainment', 'Politics', 'Entertainment', 'Tech', 'Sport', 'Sport', 'Sport', 'Business', 'Business', 'Tech', 'Sport', 'Politics', 'Politics', 'Business', 'Tech', 'Politics', 'Sport', 'Tech', 'Sport', 'Business', 'Politics', 'Sport', 'Business', 'Politics', 'Tech', 'Sport', 'Tech', 'Politics', 'Entertainment', 'Politics', 'Business', 'Entertainment', 'Sport', 'Tech', 'Tech', 'Entertainment', 'Politics', 'Entertainment', 'Sport', 'Sport', 'Politics', 'Politics', 'Entertainment', 'Business', 'Politics', 'Sport']
+Unique True Labels: {'Entertainment', 'Tech', 'Sport', 'Business', 'Politics'}
+Unique Predicted Labels: {'Entertainment', 'Tech', 'Sport', 'Business', 'Politics'}
+Classification Report:
+               precision    recall  f1-score   support
+
+     Business       1.00      0.85      0.92        40
+Entertainment       0.96      1.00      0.98        24
+     Politics       0.87      1.00      0.93        27
+        Sport       0.95      1.00      0.97        39
+         Tech       0.95      0.90      0.92        20
+
+     accuracy                           0.95       150
+    macro avg       0.95      0.95      0.95       150
+ weighted avg       0.95      0.95      0.95       150
+
+Accuracy: 94.67%
