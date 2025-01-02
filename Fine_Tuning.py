@@ -17,13 +17,7 @@ def fine_tune(model,
           logging_steps,
           output_dir,
           optim):
-    """
-    Prepares and fine-tune the pre-trained model.
 
-    :param model: Pre-trained Hugging Face model
-    :param tokenizer: Model tokenizer
-    :param dataset: Preprocessed training dataset
-    """
     model.gradient_checkpointing_enable()
     model = prepare_model_for_kbit_training(model)
     target_modules = find_all_linear_names(model)
