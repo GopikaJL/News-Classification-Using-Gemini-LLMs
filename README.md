@@ -3,14 +3,13 @@
 # **News Classification Using Gemini LLMs**
 
 ## **Project Overview**
-This project demonstrates the use of **Gemini Large Language Models (LLMs)** for **multi-class text classification** of news articles. The project focuses on leveraging **few-shot prompting** and **zero-shot testing** techniques, and implemented **fine-tuning** for enhanced model performance.using the BBC News Dataset to classify articles into categories: **Business**, **Technology**, **Sports**, **Politics**, and **Entertainment**.
+This project demonstrates the use of **Gemini Large Language Models (LLMs)** for **multi-class text classification** of news articles. The project focuses on leveraging **few-shot prompting** and **zero-shot testing** techniques, and implemented **fine-tuning** for enhanced model performance, using the BBC News Dataset to classify articles into 5 categories: **Business**, **Technology**, **Sports**, **Politics**, and **Entertainment**.
 
 
 
 ## **Key Objectives**
-1. Evaluate the performance of Gemini LLMs, specifically **Gemini Flash 1.5 Pro**, in text classification tasks.
-2. Demonstrate the effectiveness of few-shot learning in real-world datasets.
-3. Establish a robust framework for future advancements, including LangChain integration and fine-tuning.
+1. Evaluate the performance of Gemini LLMs, specifically **Gemini Flash 1.5 **, in text classification tasks.
+2. Demonstrate the effectiveness of few-shot learning in real-world datasets utilising 5 samples from each categories.
 
 ---
 
@@ -39,12 +38,12 @@ LangChain will be utilized for:
 - **Advanced Prompt Chaining**: Enable multi-step workflows, such as summarizing articles before classification.
 
 ### **Fine-Tuning**
-We aim to fine-tune the Gemini Flash 1.5 Pro model on the BBC News Dataset for:
+We aim to fine-tune the Gemini Flash 1.5  model on the BBC News Dataset for:
 - Enhanced task-specific performance.
 - Efficient use of computational resources.
+- PEFT approaches only fine-tune a small number of (extra) model parameters while freezing most parameters of the pretrained LLMs, thereby greatly decreasing the computational and storage costs
+-  QLoRA, one of the latest methods that reduces the memory usage of LLM finetuning without performance tradeoffs, using the LoraConfig class from the peft library
 
-### **Dynamic Few-Shot Selection**
-Embedding models (e.g., `e5-mistral-7b-instruct`) and vector databases (e.g., Pinecone, Qdrant) will be employed to select examples dynamically for few-shot prompting.
 
 ---
 
@@ -52,7 +51,7 @@ Embedding models (e.g., `e5-mistral-7b-instruct`) and vector databases (e.g., Pi
 ### **1. Requirements**
 - Python 3.11+
 - Gemini API Key (Sign up for Google AI Studio)
-- Dependencies: Listed in `requirements.txt`.
+
 
 ### **2. Installation**
 #### Create a Virtual Environment:
@@ -61,10 +60,7 @@ conda create -n gemini-news-classification python=3.11
 conda activate gemini-news-classification
 ```
 
-#### Install Dependencies:
-```bash
-pip install -r requirements.txt
-```
+
 
 ### **3. Configure Gemini API Key**
 - Obtain the API key from [Google AI Studio](https://aistudio.google.com).
@@ -73,6 +69,7 @@ pip install -r requirements.txt
 import google.generativeai as genai
 genai.configure(api_key="YOUR_API_KEY")
 ```
+![image](https://github.com/user-attachments/assets/e90c8520-4c88-4848-b2de-bf57db126ccd)
 
 ---
 
@@ -83,35 +80,20 @@ genai.configure(api_key="YOUR_API_KEY")
    - Dataset files are saved in the `data/` directory.
 
 2. **Text Classification**:
-   - Few-shot and zero-shot classification are performed using **Gemini Flash 1.5 Pro**.
-   - Scripts: `01_Dataset_Preparation.ipynb` and `02_Text_Classification.ipynb`.
+   - Few-shot and zero-shot classification are performed using **Gemini Flash 1.5 **.
+   - Scripts: `Few-Shot Data.py` and `data/Dataset_Preparation.ipynb`.
 
 3. **Output Cleaning**:
    - Clean raw outputs to standardize predictions.
-   - Script: `03_Data_Cleaning_of_Outputs.ipynb`.
+   - Script: `model.py`.
 
 4. **Model Evaluation**:
    - Evaluate model performance using classification reports and confusion matrices.
-   - Script: `04_Evaluation.ipynb`.
+   - Script: `Tuning.ipynb`.
 
 ---
 
 
-## Files and Workflow
-1. **Dataset Preparation** ([01_Dataset_Preparation.ipynb](workflow/01_Dataset_Preparation.ipynb)):
-   - Prepares few-shot and test datasets.
-
-2. **Text Classification** ([02_Text_Classification.ipynb](workflow/02_Text_Classification.ipynb)):
-   - Performs few-shot and zero-shot classification using Gemini Flash 1.5 Pro.
-
-3. **Data Cleaning** ([03_Data_Cleaning_of_Outputs.ipynb](workflow/03_Data_Cleaning_of_Outputs.ipynb)):
-   - Cleans raw outputs from the model.
-
-4. **Evaluation** ([04_Evaluation.ipynb](workflow/04_Evaluation.ipynb)):
-   - Computes classification metrics and plots confusion matrices.
-
-5. **Fine-Tuning** ([05_Fine_Tuning.ipynb](workflow/05_Fine_Tuning.ipynb)):
-   - Fine-tunes the model using the provided `fine_tune` function.
 
 ## How to Run
 1. Clone the repository:
