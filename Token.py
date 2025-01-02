@@ -11,3 +11,6 @@ def to_markdown(text):
   return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
 import google.generativeai as genai
 genai.configure(api_key = apiKey)
+model = genai.GenerativeModel('models/gemini-1.5-flash-8b')
+response = model.generate_content("What is python?")
+Markdown(response.text)
