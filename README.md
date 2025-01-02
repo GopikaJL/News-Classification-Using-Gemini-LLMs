@@ -3,11 +3,9 @@
 # **News Classification Using Gemini LLMs**
 
 ## **Project Overview**
-This project demonstrates the use of **Gemini Large Language Models (LLMs)** for **multi-class text classification** of news articles. The project focuses on leveraging **few-shot prompting** and **zero-shot testing** techniques, using the BBC News Dataset to classify articles into categories: **Business**, **Technology**, **Sports**, **Politics**, and **Entertainment**.
+This project demonstrates the use of **Gemini Large Language Models (LLMs)** for **multi-class text classification** of news articles. The project focuses on leveraging **few-shot prompting** and **zero-shot testing** techniques, and implemented **fine-tuning** for enhanced model performance.using the BBC News Dataset to classify articles into categories: **Business**, **Technology**, **Sports**, **Politics**, and **Entertainment**.
 
-In future iterations, we plan to integrate **LangChain** for dynamic prompt engineering and implement **fine-tuning** for enhanced model performance.
 
----
 
 ## **Key Objectives**
 1. Evaluate the performance of Gemini LLMs, specifically **Gemini Flash 1.5 Pro**, in text classification tasks.
